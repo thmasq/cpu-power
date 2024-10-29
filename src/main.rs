@@ -9,9 +9,9 @@ const ENERGY_POWER_UNIT_MSR_ADDRESS: u32 = 0xC0010299; // MSR address for energy
 const ENERGY_CORE_MSR_ADDRESS: u32 = 0xC001029A; // MSR address for core energy
 const ENERGY_PACKAGE_MSR_ADDRESS: u32 = 0xC001029B; // MSR address for package energy
 
-const DATA_COLLECTION_INTERVAL_MS: u64 = 25; // Interval for data collection in milliseconds
+const DATA_COLLECTION_INTERVAL_MS: u64 = 100; // Interval for data collection in milliseconds
 const DISPLAY_UPDATE_INTERVAL_MS: u64 = 200; // Interval for updating the display in milliseconds
-const AVERAGING_ITERATIONS: usize = 20; // Number of iterations for averaging power values
+const AVERAGING_ITERATIONS: usize = 10; // Number of iterations for averaging power values
 
 #[derive(Debug)]
 enum CpuType {

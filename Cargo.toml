@@ -3,6 +3,12 @@ name = "cpu-power"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+opt-level = 3
+lto = "fat"
+strip = true
+codegen-units = 1
+
 [dependencies]
 msru = "0.2.0"
 num_cpus = "1.16.0"
