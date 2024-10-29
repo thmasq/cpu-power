@@ -1,0 +1,8 @@
+[package]
+name = "cpu-power"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+msru = "0.2.0"
+num_cpus = "1.16.0"
