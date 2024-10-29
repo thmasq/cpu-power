@@ -1,7 +1,6 @@
 use msru::{Accessor, Msr};
 use std::collections::VecDeque;
 use std::io::{self, Write};
-use std::process::Command;
 use std::time::{Duration, Instant};
 use std::{fs, thread};
 
@@ -29,16 +28,6 @@ fn detect_cpu_type() -> CpuType {
 	} else {
 		CpuType::Unsupported
 	}
-}
-
-fn load_msr_module() -> io::Result<()> {
-	Command::new("lsmod").arg("msr").output().map_err(|_| {
-		io::Error::new(
-			io::ErrorKind::Other,
-			"MSR module not loaded! Load it with: sudo modprobe msr",
-		)
-	})?;
-	Ok(())
 }
 
 fn read_msr(msr_address: u32, core_id: usize) -> io::Result<u64> {
@@ -163,15 +152,6 @@ fn monitor_amd_msr() -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-	if !Command::new("which").arg("rdmsr").output().is_ok() {
-		eprintln!(
-			"Error: msr-tools not installed! Install it with: sudo (apt install | dnf install | pacman -S) msr-tools"
-		);
-		std::process::exit(1);
-	}
-
-	load_msr_module()?;
-
 	match detect_cpu_type() {
 		CpuType::Intel => {
 			println!("Intel CPU detected.");
