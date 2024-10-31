@@ -4,9 +4,9 @@ use std::io::{self, Write};
 use std::time::{Duration, Instant};
 use std::{fs, thread};
 
-const ENERGY_POWER_UNIT_MSR_ADDRESS: u32 = 0xC0010299; // MSR address for energy power unit
-const ENERGY_CORE_MSR_ADDRESS: u32 = 0xC001029A; // MSR address for core energy
-const ENERGY_PACKAGE_MSR_ADDRESS: u32 = 0xC001029B; // MSR address for package energy
+const ENERGY_POWER_UNIT_MSR_ADDRESS: u32 = 0xC001_0299; // MSR address for energy power unit
+const ENERGY_CORE_MSR_ADDRESS: u32 = 0xC001_029A; // MSR address for core energy
+const ENERGY_PACKAGE_MSR_ADDRESS: u32 = 0xC001_029B; // MSR address for package energy
 
 const DATA_COLLECTION_INTERVAL_MS: u64 = 100; // Interval for data collection in milliseconds
 const DISPLAY_UPDATE_INTERVAL_MS: u64 = 200; // Interval for updating the display in milliseconds
@@ -15,7 +15,7 @@ const AVERAGING_ITERATIONS: usize = 10; // Number of iterations for averaging po
 #[derive(Debug)]
 enum CpuType {
 	Intel,
-	AMD,
+	Amd,
 	Unsupported,
 }
 
@@ -24,7 +24,7 @@ fn detect_cpu_type() -> CpuType {
 	if cpuinfo.contains("GenuineIntel") {
 		CpuType::Intel
 	} else if cpuinfo.contains("AuthenticAMD") {
-		CpuType::AMD
+		CpuType::Amd
 	} else {
 		CpuType::Unsupported
 	}
@@ -39,7 +39,7 @@ fn read_msr(msr_address: u32, core_id: usize) -> io::Result<u64> {
 
 fn calculate_power(energy_start: u64, energy_end: u64, time_interval_seconds: f64, energy_unit: u64) -> f64 {
 	let energy_difference = if energy_end < energy_start {
-		energy_end + 0xFFFFFFFF - energy_start
+		energy_end + 0xFFFF_FFFF - energy_start
 	} else {
 		energy_end - energy_start
 	};
@@ -57,10 +57,7 @@ fn read_energy_joules() -> io::Result<u64> {
 }
 
 fn monitor_intel_rapl() -> io::Result<()> {
-	println!(
-		"Monitoring CPU Power Usage using RAPL (Watts) every {} ms...",
-		DATA_COLLECTION_INTERVAL_MS
-	);
+	println!("Monitoring CPU Power Usage using RAPL (Watts) every {DATA_COLLECTION_INTERVAL_MS} ms...");
 	println!("Press Ctrl+C to stop.");
 
 	let mut power_readings = VecDeque::with_capacity(AVERAGING_ITERATIONS);
@@ -83,9 +80,9 @@ fn monitor_intel_rapl() -> io::Result<()> {
 			power_readings.pop_front();
 		}
 
-		if last_display_time.elapsed().as_millis() >= DISPLAY_UPDATE_INTERVAL_MS as u128 {
+		if last_display_time.elapsed().as_millis() >= u128::from(DISPLAY_UPDATE_INTERVAL_MS) {
 			let average_power: f64 = power_readings.iter().sum::<f64>() / power_readings.len() as f64;
-			print!("\rAverage Package Power: {:.2} W", average_power);
+			print!("\rAverage Package Power: {average_power:.2} W");
 			let _ = io::stdout().flush();
 			last_display_time = Instant::now();
 		}
@@ -93,10 +90,7 @@ fn monitor_intel_rapl() -> io::Result<()> {
 }
 
 fn monitor_amd_msr() -> io::Result<()> {
-	println!(
-		"Monitoring Package and Core Power Usage (Watts) every {} ms...",
-		DATA_COLLECTION_INTERVAL_MS
-	);
+	println!("Monitoring Package and Core Power Usage (Watts) every {DATA_COLLECTION_INTERVAL_MS} ms...");
 	println!("Press Ctrl+C to stop.");
 
 	let rapl_units = read_msr(ENERGY_POWER_UNIT_MSR_ADDRESS, 0)?;
@@ -139,12 +133,9 @@ fn monitor_amd_msr() -> io::Result<()> {
 			power_readings.pop_front();
 		}
 
-		if last_display_time.elapsed().as_millis() >= DISPLAY_UPDATE_INTERVAL_MS as u128 {
+		if last_display_time.elapsed().as_millis() >= u128::from(DISPLAY_UPDATE_INTERVAL_MS) {
 			let average_pkg_power: f64 = power_readings.iter().sum::<f64>() / power_readings.len() as f64;
-			print!(
-				"\rAverage Package Power: {:6.2} W | Total Core Power: {:6.2} W",
-				average_pkg_power, total_core_power
-			);
+			print!("\rAverage Package Power: {average_pkg_power:6.2} W | Total Core Power: {total_core_power:6.2} W");
 			let _ = io::stdout().flush();
 			last_display_time = Instant::now();
 		}
@@ -162,7 +153,7 @@ fn main() -> io::Result<()> {
 				std::process::exit(1);
 			}
 		},
-		CpuType::AMD => {
+		CpuType::Amd => {
 			println!("AMD CPU detected. Using MSR for power monitoring.");
 			monitor_amd_msr()?;
 		},
