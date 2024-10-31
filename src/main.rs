@@ -120,7 +120,7 @@ const fn calculate_power_uw(energy_start: u64, energy_end: u64, time_interval_ms
 
 fn display_power_readings(readings: &PowerReading, physical_cores: usize) -> io::Result<()> {
 	let total_lines = (physical_cores + 1) / 2 + 2;
-	print!("\x1B[{}A", total_lines);
+	print!("\x1B[{total_lines}A");
 
 	print!("\x1B[2K");
 	println!(
