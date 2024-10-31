@@ -179,11 +179,7 @@ fn monitor_cpu_power(cpu_type: &CpuType) -> io::Result<()> {
 	println!();
 
 	let energy_unit = get_energy_unit(cpu_type)?;
-	let physical_cores = if matches!(cpu_type, CpuType::Intel) {
-		1
-	} else {
-		num_cpus::get() / 2
-	};
+	let physical_cores = num_cpus::get_physical();
 
 	let mut monitor = PowerMonitor::new(physical_cores);
 
