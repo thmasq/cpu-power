@@ -1,7 +1,10 @@
 [package]
 name = "cpu-power"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+license = "GPL-3.0-only"
+readme = "README.md"
+description = "A framework for building syscall interposers for user-space Linux applications"
 
 [profile.release]
 opt-level = 3
@@ -10,6 +13,6 @@ strip = true
 codegen-units = 1
 
 [dependencies]
-libc = "0.2.171"
-msru = "0.2.0"
-num_cpus = "1.16.0"
+libc = "0.2"
+msru = "0.2"
+num_cpus = "1"
