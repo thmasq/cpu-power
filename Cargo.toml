@@ -10,5 +10,6 @@ strip = true
 codegen-units = 1
 
 [dependencies]
+libc = "0.2.171"
 msru = "0.2.0"
 num_cpus = "1.16.0"
